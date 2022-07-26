@@ -1,11 +1,14 @@
 import imgui
 from level import *
-import style, glob, os, platform, traceback, colorsys, math, webbrowser, time
+import style, glob, os, platform, traceback, colorsys, math, webbrowser, time, threading
 from pathlib import Path
 from state import usefulmod, Design
 import hubtools
+from update import Updater, UpdateThread
 class Editor:
     def __init__(self):
+        self.update_thread = UpdateThread()
+        self.check_update = True
         self.cursor_held = None
         self.last_hovered = None
         self.hovered = None
@@ -178,6 +181,13 @@ class Editor:
                 imgui.text("to open in-game.")
                 imgui.end_menu()
             imgui.end_main_menu_bar()
+        # Check for update after main menu so it doesn't look too wierd
+        if self.check_update:
+            self.check_update = False
+            threading.Thread(target=Updater(self.update_thread).update).start()
+        if self.update_thread.running:
+            if len(self.update_thread.popup):
+                imgui.open_popup(self.update_thread.popup.pop())
         # Shortcuts
         if io.key_ctrl:
             if keyboard.n.pressed:
@@ -224,6 +234,12 @@ class Editor:
             usefulmod.warn = False
             imgui.open_popup("extra.useful")
         # Popups
+        if imgui.begin_popup("update.found"):
+            imgui.push_style_color(imgui.COLOR_TEXT, 0.0, 1.0, 0.0)
+            imgui.text('Update Avaliable')
+            imgui.text('Downloading update')
+            imgui.pop_style_color(1)
+            imgui.end_popup()
         if imgui.begin_popup("secret.gui"):
             imgui.push_style_color(imgui.COLOR_TEXT, .702, 0, .42)
             imgui.text("""+------------------------+
