@@ -17,6 +17,7 @@ class Updater:
         REPO_API = "https://api.github.com/repos/"
         REPO = "sudo-hazel/Parabox-Editor"
         GIT_BRANCH = "updater"
+        self.dir = os.path.dirname(__file__) + os.sep
         # Five minutes
         # Used to prevent github timeout by waiting ourselves
         # TODO fix timeout for prod
@@ -30,24 +31,25 @@ class Updater:
         self.helper.running=True
         self.helper.progress.append("update.found")
         with requests.get(self.zip_url, stream=True) as r:
-            with open(UPDATE_ZIP, 'wb') as f:
+            with open(self.dir + UPDATE_ZIP, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
         self.helper.progress.append("update.downloaded")
         with ZipFile("update.zip", 'r') as zip:
             files = zip.namelist()
             prefix = files[0]
             for path in [f for f in files if f.endswith(".py")]:
-                zip.extract(path)
-            files = os.listdir(prefix)
+                zip.extract(path, self.dir)
+            files = os.listdir(self.dir+prefix)
             self.helper.progress.append("update.warn")
             for file in files:
-                if os.path.isdir(file):
-                    shutil.rmtree(file)
-                if os.path.isdir(prefix + file):
-                    shutil.copytree(prefix + file, file)
+                if os.path.isdir(self.dir + file):
+                    shutil.rmtree(self.dir + file)
+                if os.path.isdir(self.dir + prefix + file):
+                    shutil.copytree(self.dir + prefix + file, self.dir + file)
                 else:
-                    shutil.copy(prefix + file, file)
-            shutil.rmtree(prefix)
+                    shutil.copy(self.dir + prefix + file, self.dir + file)
+            shutil.rmtree(self.dir + prefix)
+            os.remove(self.dir+UPDATE_ZIP)
         self.helper.updated = True
     # Also updates helper state
     def update_version(self, hash):
@@ -57,7 +59,7 @@ class Updater:
         }
         self.helper.running = False
         self.helper = None
-        with open("version","w") as v_file:
+        with open(self.dir+"version","w") as v_file:
             json.dump(v_data, v_file)
     def check_latest(self, curr_hash):
         # Check for updates (popup?)
@@ -70,16 +72,13 @@ class Updater:
             self.update_version(curr_hash)
     def update(self):
         # give imgui a little bit of time to become presentable
-        if not os.path.exists("version"):
-            print("New Install?")
+        if not os.path.exists(self.dir+"version"):
             # Literally just update at this point.
             self.check_latest(None)
         else:
-            with open("version") as v_file:
+            with open(self.dir+"version") as v_file:
                 v_data = json.load(v_file)
-                print("Read Version")
                 if v_data["last_check"] + self.TIMEOUT < int(time.time()):
-                    print("Attempt Update")
                     self.check_latest(v_data["hash"])
 
 
