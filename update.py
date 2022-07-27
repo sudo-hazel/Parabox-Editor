@@ -72,7 +72,7 @@ class Updater:
         time.sleep(2)
         if not os.path.exists("version"):
             # Literally just update at this point.
-            self.check_latest(None, True)
+            self.check_latest(None)
         else:
             with open("version") as v_file:
                 v_data = json.load(v_file)
