@@ -63,7 +63,7 @@ class Updater:
         commit_data = requests.get(self.commit_url).json()
         hash = commit_data["sha"]
         if curr_hash != hash:
-            self.upgrade(hash)
+            self.upgrade()
             self.update_version(hash)
         else:
             self.update_version(curr_hash)
