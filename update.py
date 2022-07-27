@@ -66,5 +66,12 @@ with ZipFile("update.zip", 'r') as zip:
     for path in [f for f in files if f.endswith(".py")]:
         zip.extract(path)
     files = os.listdir(prefix)
-    print(files)
+    # Warn
+    for file in files:
+        if os.path.isdir(file):
+            shutil.rmtree(file)
+        if os.path.isdir(prefix + file):
+            shutil.copytree(prefix + file, file)
+        else:
+            shutil.copy(prefix + file, file)
     
