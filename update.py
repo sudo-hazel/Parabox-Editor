@@ -9,7 +9,7 @@ INITIAL_PUSH_TIME = int(time.time())
 V_FILE = "Version"
 class UpdateThread:
     def __init__(self):
-        self.running = True
+        self.running = False
         self.progress = [""]
         self.updated = False
 class Updater:
@@ -27,6 +27,7 @@ class Updater:
         self.zip_url = REPO_API + REPO + "/zipball/" + GIT_BRANCH 
     def upgrade(self):
         UPDATE_ZIP = "update.zip"
+        self.helper.running=True
         self.helper.progress.append("update.found")
         with requests.get(self.zip_url, stream=True) as r:
             with open(UPDATE_ZIP, 'wb') as f:
@@ -69,7 +70,7 @@ class Updater:
             self.update_version(curr_hash)
     def update(self):
         # give imgui a little bit of time to become presentable
-        time.sleep(2)
+        time.sleep(1)
         if not os.path.exists("version"):
             # Literally just update at this point.
             self.check_latest(None)
