@@ -34,12 +34,12 @@ class Updater:
             with open(self.dir + UPDATE_ZIP, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
         self.helper.progress.append("update.downloaded")
-        with ZipFile("update.zip", 'r') as zip:
+        with ZipFile(self.dir + UPDATE_ZIP, 'r') as zip:
             files = zip.namelist()
             prefix = files[0]
             for path in [f for f in files if f.endswith(".py")]:
                 zip.extract(path, self.dir)
-            files = os.listdir(self.dir+prefix)
+            files = os.listdir(self.dir + prefix)
             self.helper.progress.append("update.warn")
             for file in files:
                 if os.path.isdir(self.dir + file):
@@ -49,7 +49,8 @@ class Updater:
                 else:
                     shutil.copy(self.dir + prefix + file, self.dir + file)
             shutil.rmtree(self.dir + prefix)
-            os.remove(self.dir+UPDATE_ZIP)
+            # Doesnt like this line. Just leave it.
+        os.remove(self.dir+UPDATE_ZIP)
         self.helper.updated = True
     # Also updates helper state
     def update_version(self, hash):
