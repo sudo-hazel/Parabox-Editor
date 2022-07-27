@@ -70,14 +70,16 @@ class Updater:
             self.update_version(curr_hash)
     def update(self):
         # give imgui a little bit of time to become presentable
-        time.sleep(1)
         if not os.path.exists("version"):
+            print("New Install?")
             # Literally just update at this point.
             self.check_latest(None)
         else:
             with open("version") as v_file:
                 v_data = json.load(v_file)
+                print("Read Version")
                 if v_data["last_check"] + self.TIMEOUT < int(time.time()):
+                    print("Attempt Update")
                     self.check_latest(v_data["hash"])
 
 
