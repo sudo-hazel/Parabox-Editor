@@ -21,8 +21,6 @@ class Updater:
         # Used to prevent github timeout by waiting ourselves
         # TODO fix timeout for prod
         self.TIMEOUT = 5 * 60 * 1 #000
-        # We don't need every file. Just the python files
-        self.update_as = ["*.py"]
         # Builds more values
         self.helper = helper
         self.commit_url = REPO_API + REPO + "/commits/" + GIT_BRANCH
