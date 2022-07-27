@@ -187,7 +187,7 @@ class Editor:
             threading.Thread(target=Updater(self.update_thread).update).start()
         if self.update_thread.running or self.update_thread.updated:
             if len(self.update_thread.progress):
-                imgui.set_next_window_size(180,80)
+                imgui.set_next_window_size(380,120)
                 imgui.begin("Updater")
                 stages = self.update_thread.progress
                 imgui.push_style_color(imgui.COLOR_TEXT, 0.0, 1.0, 0.0)
