@@ -2,6 +2,8 @@ import requests
 import os
 import time
 import json
+import shutil
+from zipfile import ZipFile
 # Very jank. Use file to determine if update is new or not
 INITIAL_PUSH_TIME = int(time.time())
 V_FILE = "Version"
@@ -9,7 +11,7 @@ class Updater:
     def __init__(self, helper):
         REPO_API = "https://api.github.com/repos/"
         REPO = "sudo-hazel/Parabox-Editor"
-        GIT_BRANCH = "master"
+        GIT_BRANCH = "updater"
         # Five minutes
         # Used to prevent github timeout by waiting ourselves
         # TODO fix timeout for prod
@@ -21,8 +23,12 @@ class Updater:
         self.commit_url = REPO_API + REPO + "/commits/" + GIT_BRANCH
         self.zip_url = REPO_API + REPO + "/zipball/" + GIT_BRANCH 
     def upgrade(self, *args):
-        self.helper.popup.append("update.found")
-
+        UPDATE_ZIP = "update.zip"
+        self.helper.progress.append("update.found")
+        with requests.get(self.zip_url, stream=True) as r:
+            with open(UPDATE_ZIP, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+        self.helper.progress.append("update.downloaded")
     def update_version(self, hash):
         v_data = {
             "hash" : str(hash),
@@ -53,4 +59,12 @@ class Updater:
 class UpdateThread:
     def __init__(self):
         self.running = True
-        self.popup = [""]
+        self.progress = [""]
+with ZipFile("update.zip", 'r') as zip:
+    files = zip.namelist()
+    prefix = files[0]
+    for path in [f for f in files if f.endswith(".py")]:
+        zip.extract(path)
+    files = os.listdir(prefix)
+    print(files)
+    
