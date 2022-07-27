@@ -185,9 +185,26 @@ class Editor:
         if self.check_update:
             self.check_update = False
             threading.Thread(target=Updater(self.update_thread).update).start()
-        if self.update_thread.running:
-            if len(self.update_thread.popup):
-                imgui.open_popup(self.update_thread.popup.pop())
+        if self.update_thread.running or self.update_thread.updated:
+            if len(self.update_thread.progress) and imgui.begin("Updater"):
+                stages = self.update_thread.progress
+                imgui.push_style_color(imgui.COLOR_TEXT, 0.0, 1.0, 0.0)
+                if "update.found" in stages:
+                    imgui.text("A new update has been detected")
+                    if "update.downloaded" not in stages:
+                        imgui.text("Downloading..")
+                    else:
+                        imgui.text("Downloading... Done!")
+                        imgui.text("Begining install of update")
+                        if "update.warn" in stages:
+                            if not self.update_thread.updated:
+                                imgui.pop_style_color(1)
+                                imgui.push_style_color(imgui.COLOR_TEXT, 1.0, 0.0, 0.0)
+                                imgui.text("Updating... Do not exit Editor")
+                            else:
+                                imgui.text("Updated... Please restart Editor")
+                imgui.pop_style_color(1)
+                imgui.end()
         # Shortcuts
         if io.key_ctrl:
             if keyboard.n.pressed:
@@ -234,12 +251,6 @@ class Editor:
             usefulmod.warn = False
             imgui.open_popup("extra.useful")
         # Popups
-        if imgui.begin_popup("update.found"):
-            imgui.push_style_color(imgui.COLOR_TEXT, 0.0, 1.0, 0.0)
-            imgui.text('Update Avaliable')
-            imgui.text('Downloading update')
-            imgui.pop_style_color(1)
-            imgui.end_popup()
         if imgui.begin_popup("secret.gui"):
             imgui.push_style_color(imgui.COLOR_TEXT, .702, 0, .42)
             imgui.text("""+------------------------+
