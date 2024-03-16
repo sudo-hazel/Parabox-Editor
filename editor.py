@@ -68,7 +68,7 @@ class Editor:
                 difficulty, possess_vfx, level_number = [int(n) for n in puzzle_data[Path(self.level_name).stem]]
             except (FileNotFoundError, KeyError):
                 pass
-        with open(self.level_name) as file:
+        with open(self.level_name, encoding="utf8") as file:
             try:
                 self.level = Level(self.level_name, file.read(), level_number, hub_parent, difficulty, bool(possess_vfx), credits, **kwargs)
             except Exception as Err:
@@ -78,12 +78,12 @@ class Editor:
                 
     def save_level(self):
         save_data, is_hub, parent, level_number, areas, credits, possess_fx, difficulty = self.level.save()
-        with open(self.level_name, "w" if os.path.exists(self.level_name) else "x") as file:
+        with open(self.level_name, "w" if os.path.exists(self.level_name) else "x", encoding="utf8") as file:
             file.write(save_data)
         if is_hub:
             with open('credits.txt','x' if not os.path.exists('credits.txt') else 'w') as f:
                 f.write(credits)
-            with open('area_data.txt','x' if not os.path.exists('area_data.txt') else 'w') as f:
+            with open('area_data.txt','x' if not os.path.exists('area_data.txt') else 'w', encoding="utf8") as f:
                 f.write('\n'.join([f'{name.replace(" ","_")} {music}' if name is not None else '' for name, music in areas]))
             if not os.path.exists('save0.txt'):
                 with open('save0.txt','x'):

@@ -205,7 +205,8 @@ class Block:
 
     def remove_child(self, child):
         child.parent = None
-        self.children.remove(child)
+        if child in self.children:
+            self.children.remove(child)
         return child
 
     def place_child(self, x, y, child, refcheck=True):
