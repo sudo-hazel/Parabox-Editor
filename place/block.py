@@ -304,8 +304,6 @@ class Block:
             if imgui.get_io().key_shift:
                 self.height = value
         imgui.same_line()
-        
-        print(imgui.core.get_mouse_pos())
         imgui_label_left("Height")
         imgui.same_line()
         imgui.core.push_id("block_height")
