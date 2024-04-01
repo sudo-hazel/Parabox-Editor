@@ -3,6 +3,7 @@ from level import *
 import style, glob, os, platform, traceback, colorsys, math, webbrowser, time
 from pathlib import Path
 from state import usefulmod, Design
+# from state import FrameDebug
 import hubtools
 class Editor:
     def __init__(self):
@@ -400,25 +401,87 @@ class Editor:
                 pass
 
             window_size = imgui.get_io().display_size
+
+            imgui.set_next_window_size(window_size.x - 60, 80, condition=imgui.APPEARING)
+            imgui.set_next_window_position(30, window_size.y - 400, condition=imgui.APPEARING)
+            """
+            if imgui.begin("StyleDebug"):  
+                FrameDebug.ensure('ret', "None")
+                FrameDebug.ensure('rep', False)
+                FrameDebug.ensure('pal', False)
+                FrameDebug.ensure('code', "")
+                FrameDebug.ensure('codeh', 30)
+                #region Debug UI
+                imgui.core.push_id("frd1")
+                _, code = imgui.input_text_multiline('',FrameDebug.code, 2056, imgui.get_content_region_available()[0], FrameDebug.codeh); FrameDebug.code = code
+                imgui.core.pop_id()
+                if FrameDebug.rep: imgui.core.push_style_color(imgui.COLOR_BUTTON, .7, 0, .42, 1)   
+                evalp = imgui.button("eval")
+                if FrameDebug.rep: imgui.core.pop_style_color(1)
+                imgui.same_line()
+                _, rep = imgui.checkbox("Rep", FrameDebug.rep); FrameDebug.rep = rep
+                imgui.same_line()
+                _, pal = imgui.checkbox("Pal", FrameDebug.pal); FrameDebug.pal = pal
+                imgui.same_line()
+                imgui.core.push_item_width(60)
+                imgui.core.push_id("frd2")
+                _, codeh = imgui.input_text('', str(FrameDebug.codeh), 4); 
+                if not imgui.core.is_item_active():
+                    FrameDebug.codeh = int(codeh)
+                imgui.core.pop_id()
+                imgui.core.pop_item_width()
+                imgui.text(str(FrameDebug.ret))
+                #endregion
+                if not pal:
+                    if FrameDebug.rep or evalp:
+                        if not ("print" in code):
+                            FrameDebug.ret = eval(FrameDebug.code)
+                        else:
+                            _print = FrameDebug.print
+                            exec(FrameDebug.code)
+                            FrameDebug.ret = FrameDebug.printload()
+                imgui.end()
+            """
             imgui.set_next_window_size(window_size.x - 60, 80, condition=imgui.APPEARING)
             imgui.set_next_window_position(30, window_size.y - 110, condition=imgui.APPEARING)
             if not self.hub.hidePalette() and imgui.begin("Palette"):
-                if imgui.begin_child("nodrag", 0, 0, False, imgui.WINDOW_NO_MOVE):
-
+                w2, h2= imgui.get_content_region_available()
+                # without scroll, w = w2-16, h = h2-16
+                # From h2 we want 35+4 + 50*(rows-1) or -11+50*rows
+                # x,y values work well with and without scrollbar
+                pallete_blocks=[self.level.blocks[i] for i in sorted(self.level.blocks.keys())]
+                palette_owns = len(self.samples)+len(pallete_blocks)+1
+                palette_width = int((w2) / 50)  # How many pallete members fit pn each row?
+                if palette_width == 0:          # Always be at least one
+                        palette_width = 1
+                palette_block_height =  -(-palette_owns // palette_width) # We need this many rows
+                # blo
+                if imgui.begin_child("nodrag", 0, 50*palette_block_height-5, True, imgui.WINDOW_NO_MOVE):
+                    
                     w, h = imgui.get_content_region_available()
-                    palette_width = int(w / 50)
-                    if palette_width == 0:
-                        palette_width = 1 # prevent divide by 0 error when palette is too skinny
+                    palette_height = int((h+20) / 50)
+                    #region Debug
+                    """
+                    if FrameDebug.pal:
+                        if FrameDebug.rep or evalp:
+                            if not ("print" in FrameDebug.code):
+                                FrameDebug.ret = eval(FrameDebug.code)
+                            else:
+                                print = FrameDebug.print
+                                exec(FrameDebug.code)
+                                FrameDebug.ret = FrameDebug.printload()
+                                print = builtins.print
+                    """
+                    #endregion
                     draw_list = imgui.get_window_draw_list()
                     x, y = imgui.get_window_position()
-                    x += 2
+                    x += 5
                     y += 2
-
                     i = 0
                     for sample in self.samples:
                         sample.draw(draw_list, x + (i % palette_width)*50, y + int(i / palette_width)*50, 40, 40, self.level, -0.5, False)
                         i += 1
-                    for block in [self.level.blocks[i] for i in sorted(self.level.blocks.keys())]:
+                    for block in pallete_blocks:
                         block.draw(draw_list, x + (i % palette_width)*50, y + int(i / palette_width)*50, 40, 40, self.level, -0.5, block.fliph)
                         i += 1
                     px, py = x + (i % palette_width)*50, y + int(i / palette_width)*50
@@ -525,7 +588,6 @@ class Editor:
                             self.menuing = None
                 imgui.end_child()
                 imgui.end()
-
             if self.cursor_held:
                 x, y = imgui.get_mouse_position()
                 self.cursor_held.draw(overlay_draw_list, x - 10, y - 10, 20, 20, self.level, 0, False)
