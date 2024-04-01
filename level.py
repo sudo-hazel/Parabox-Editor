@@ -23,6 +23,7 @@ class Level:
         self.next_free = 0
         self.credits = credits
         self.music = {}
+        self.editor_options = {'preopen': True}
         # UsefulState
         useful_warn = False
         #
@@ -72,11 +73,21 @@ class Level:
                 musicnum = int(musicnum)
                 music[area]=musicnum
             kwargs["music"] = music
+        
         for line in data:
             # UsefulState
+
+            trimmed = line.replace("\t","")
+            args = trimmed.split(" ")
+            if len(args)>0:
+                block_type = args.pop(0)
+            if block_type == "#":
+                if len(args)>0:
+                    setting = args.pop(0)
+                    if setting == "ZyganLazyLoad":
+                        self.editor_options['preopen'] = False
             if usefulmod.purge:
                 kwargs["purge"] = True
-            trimmed = line.replace("\t","")
             last_indent = indent
             indent = len(line) - len(trimmed)
             if indent == last_indent:
@@ -96,8 +107,7 @@ class Level:
                     stack.pop()
             if parent == None and indent != 0:
                 parent = stack[-1]
-            args = trimmed.split(" ")
-            block_type = args.pop(0)
+
             if block_type == "Block":
                 block = Block(self, *args, **kwargs)
                 # For UsefulMod
@@ -187,7 +197,9 @@ class Level:
         if self.metadata["epsi_fix"]:
             data += "epsi_fix 1\n"
         data += "#\n"
-        
+        # Our comment system
+        if self.editor_options['preopen'] == False:
+            data += "# ZyganLazyLoad\n"
         to_save = list(self.blocks.values())
         # print(to_save[0].children)
         saved_blocks = []
