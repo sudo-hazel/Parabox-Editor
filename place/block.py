@@ -1,6 +1,6 @@
 import imgui, colorsys
 from place.walls import Wall
-from .utils import to_bool, draw_epsilon, draw_shine, draw_eyes, draw_weight, draw_pin, useful_change, special_effects, inbounds
+from .utils import to_bool, draw_epsilon, draw_shine, draw_eyes, draw_weight, draw_pin, useful_change, special_effects, inbounds, imgui_label_left
 from state import Design, UIstate, usefulmod
 from .palette import Palette
 from .ref import Ref
@@ -33,7 +33,7 @@ class Block:
         self.exitref = None
         self.refs = set()
         self.level = level
-        self.show = True
+        self.show = False
         self.music = None
         # UsefulMod (Internal)
         if "usefulTags" in kwargs: self.usefulTags = kwargs["usefulTags"]
@@ -200,7 +200,8 @@ class Block:
 
     def remove_child(self, child):
         child.parent = None
-        self.children.remove(child)
+        if child in self.children:
+            self.children.remove(child)
         return child
 
     def place_child(self, x, y, child, refcheck=True):
@@ -245,13 +246,23 @@ class Block:
         child.y = y
 
     def menu(self, level):
+        if self.level.editor_options['preopen'] == False:
+            changed, value = imgui.checkbox("Show", to_bool(self.show))
+            if changed:
+                self.show=value
+            imgui.separator()
         if Design.placedebug:
             imgui.bullet_text(str(self))
             imgui.bullet_text("Exit:"+str(self.exitref))
             imgui.bullet_text("Par:"+str(self.parent))
             imgui.bullet_text("Music:"+str(self.music))
+        imgui.core.push_item_width(90)
         try:
-            changed, value = imgui.input_int("ID", self.id, flags=imgui.INPUT_TEXT_ENTER_RETURNS_TRUE)
+            imgui_label_left(" ID :")
+            imgui.core.push_id("block_ID")
+            changed, value = imgui.input_int("", self.id, flags=imgui.INPUT_TEXT_ENTER_RETURNS_TRUE)
+            imgui.core.pop_id()
+            imgui.same_line()
             if changed:
                 if not UIstate.focused:
                     UIstate.focused = True
@@ -269,19 +280,40 @@ class Block:
                     UIstate.focused = False
         except:
             pass
-        changed, value = imgui.input_int("Width", self.width)
+        
+        imgui_label_left("Zoom Factor")
+        
+        imgui.core.push_id("block_zf")
+        imgui.core.push_item_width(55)
+        changed, value = imgui.input_float("", self.zoomfactor)
+        imgui.core.pop_item_width()
+        imgui.core.pop_id()
+        if changed:
+            self.zoomfactor = value
+        imgui_label_left("Width")
+        imgui.core.push_id("block_width")
+        changed, value = imgui.input_int("", self.width)
+        imgui.core.pop_id()
         if changed and value > 0:
             self.width = value
             if imgui.get_io().key_shift:
                 self.height = value
-        changed, value = imgui.input_int("Height", self.height)
+        imgui.same_line()
+        imgui_label_left("Height")
+        imgui.same_line()
+        imgui.core.push_id("block_height")
+        changed, value = imgui.input_int("", self.height)
+        imgui.core.pop_id()
+        imgui.pop_item_width()
+        imgui.separator()
+        
         if changed and value > 0:
             self.height = value
             if imgui.get_io().key_shift:
                 self.width = value
-        changed, value = imgui.input_float("Zoom Factor", self.zoomfactor)
-        if changed:
-            self.zoomfactor = value
+        
+        
+       
         if imgui.begin_menu("Change Block Color"):
             for color in Palette.pals[0].colors:
                 h, s, v = Palette.pals[level.metadata["custom_level_palette"]].get_color(color)
@@ -315,6 +347,7 @@ class Block:
             if changed:
                 self.playerorder = value
             imgui.unindent()
+        imgui.same_line()
         changed, value = imgui.checkbox("Possessable", to_bool(self.possessable))
         if changed:
             self.possessable = int(value)
@@ -324,7 +357,9 @@ class Block:
         changed, value = imgui.checkbox("Float in Space", to_bool(self.floatinspace))
         if changed:
             self.floatinspace = int(value)
+        imgui.core.push_item_width(90)
         changed, value = imgui.combo("Special Effect", list(special_effects.keys()).index(self.specialeffect), list(special_effects.values()))
+        imgui.core.pop_item_width()
         if changed:
             self.specialeffect = list(special_effects.keys())[value]
         # UsefulMod (Conditional UI)
