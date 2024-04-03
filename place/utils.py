@@ -1,6 +1,5 @@
 from math import cos, pi, floor
 import time
-import imgui
 def inbounds(place):
     if not place.parent: return True
     return 0 <= place.x < place.parent.width and 0 <= place.y < place.parent.height
@@ -70,8 +69,8 @@ epsilon_polyline = [
     (0.7, 0.3), (0.4, 0.25), (0.3, 0.35), (0.4, 0.5), (0.6, 0.5)
 ]
 def draw_epsilon(draw_list, x, y, width, height):
-    draw_list.add_polyline([(x + u*width, y + v*height) for u, v in epsilon_polyline], 0x6fffffff, False, min(width,height)/10)
-    draw_list.add_polyline([(x + u*width, y + (1-v)*height) for u, v in epsilon_polyline], 0x6fffffff, False, min(width,height)/10)
+    draw_list.add_polyline([(x + u*width, y + v*height) for u, v in epsilon_polyline], 0xffffffff, False, min(width,height)/10)
+    draw_list.add_polyline([(x + u*width, y + (1-v)*height) for u, v in epsilon_polyline], 0xffffffff, False, min(width,height)/10)
 
 def half_cos(t):
     t = t % (2*pi)
@@ -116,10 +115,3 @@ special_effects = {
 }
 
 floor_types = ['None','Button','PlayerButton','FastTravel','Info','DemoEnd','Break','Portal','Gallery','Show','Smile']
-
-def imgui_label_left(lbl):
-    imgui.begin_group(); 
-    imgui.core.push_style_var(imgui.STYLE_ITEM_SPACING,(0,0))
-    imgui.core.dummy(0,3); imgui.text(lbl); 
-    imgui.core.pop_style_var()
-    imgui.end_group(); imgui.same_line()

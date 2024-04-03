@@ -11,7 +11,7 @@ from imgui.integrations.sdl2 import SDL2Renderer
 
 import time
 
-from editor import Editor
+from editor import *
 import style as imgui_style
 
 class Key:

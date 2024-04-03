@@ -24,7 +24,6 @@ class Level:
         self.next_free = 0
         self.credits = credits
         self.music = {}
-        self.editor_options = {'preopen': True}
         # UsefulState
         useful_warn = False
         #
@@ -77,21 +76,11 @@ class Level:
                 musicnum = int(musicnum)
                 music[area]=musicnum
             kwargs["music"] = music
-        
         for line in data:
             # UsefulState
-
-            trimmed = line.replace("\t","")
-            args = trimmed.split(" ")
-            if len(args)>0:
-                block_type = args.pop(0)
-            if block_type == "#":
-                if len(args)>0:
-                    setting = args.pop(0)
-                    if setting == "ZyganLazyLoad":
-                        self.editor_options['preopen'] = False
             if usefulmod.purge:
                 kwargs["purge"] = True
+            trimmed = line.replace("\t","")
             last_indent = indent
             indent = len(line) - len(trimmed)
             if indent == last_indent:
@@ -111,50 +100,11 @@ class Level:
                     stack.pop()
             if parent == None and indent != 0:
                 parent = stack[-1]
+            args = trimmed.split(" ")
+            block_type = args.pop(0)
 
-            if block_type == "Block":
-                block = Block(self, *args, **kwargs)
-                # For UsefulMod
-                kwargs["usefulTags"]=[]
-                block.parent = parent
-                if parent:
-                    parent.place_child(int(block.x), int(block.y), block)
-                last_block = block
-                if block.fillwithwalls != 1:
-                    if not int(block.id) in self.blocks:
-                        self.blocks[int(block.id)] = block
-                    else:
-                        print("duplicate block with id " + str(block.id))
-            elif block_type == "Ref":
-                ref = Ref(self, *args, **kwargs)
-                kwargs["usefulTags"]=[]
-                if not int(ref.infenter):
-                    refs.append(ref)
-                if parent:
-                    parent.place_child(int(ref.x), int(ref.y), ref)
-                else: 
-                    # TODO this is a fatal loading error. Add debug message
-                    pass
-                last_block = ref
-            elif block_type == "Wall":
-                if len(args) > 6:
-                    wall = Wall(*args[:5],"_".join(args[5:]))
-                else:
-                    wall = Wall(*args)
-                if parent:
-                    parent.place_child(int(wall.x), int(wall.y), wall)
-                else:
-                    print("Discarding wall at root level")
-                last_block = wall
-            elif block_type == "Floor":
-                floor = Floor(*args[:3], " ".join(args[3:]).replace("_"," ").replace('\\n','\n'))
-                if parent:
-                    parent.place_child(int(floor.x), int(floor.y), floor)
-                else:
-                    print("Discarding floor at root level")
-                last_block = floor
-            # UsefulMod (Always Enabled Internal)
-            elif len(block_type) > 0 and block_type[0]=="?":
+            # START LINE TEXT PARSING
+            if not usefulmod.purge and len(block_type) > 0 and block_type[0]=="?":
                 useful_warn = True
                 if block_type[1:] in tags["base"]:
                     kwargs["usefulTags"].append(block_type[1:])
@@ -250,9 +200,7 @@ class Level:
             data += "epsi_fix 1\n"
         """
         data += "#\n"
-        # Our comment system
-        if self.editor_options['preopen'] == False:
-            data += "# ZyganLazyLoad\n"
+        
         to_save = list(self.blocks.values())
         # print(to_save[0].children)
         saved_blocks = []

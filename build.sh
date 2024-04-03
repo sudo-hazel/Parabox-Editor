@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+
 if [ -z "$1" ]; then
     echo "Current $(grep -e "version = .*" build.spec)"
     echo "Enter new version (or nothing to keep current):"
