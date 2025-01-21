@@ -327,7 +327,7 @@ class Block:
             imgui.separator()
 
             r, g, b = colorsys.hsv_to_rgb(self.hue, self.sat, self.val)
-            changed, (r, g, b) = imgui.color_edit3("Color", r, g, b, imgui.COLOR_EDIT_HSV | imgui.COLOR_EDIT_FLOAT)
+            changed, (r, g, b) = imgui.color_edit3("Color", r, g, b, imgui.COLOR_EDIT_DISPLAY_HSV  | imgui.COLOR_EDIT_FLOAT)
             if changed:
                 self.hue, self.sat, self.val = colorsys.rgb_to_hsv(r, g, b)
             imgui.end_menu()

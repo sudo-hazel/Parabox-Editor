@@ -33,7 +33,7 @@ class Floor:
 
     def draw(self, draw_list, x, y, width, height, level, depth, flip):
         border = True
-        color = self.parent.color(level) if self.parent else 0x7fffffff
+        color = imgui.get_color_u32_rgba(1,1,1,.5) if self.parent else 0x7fffffff
 
         if self.type == "PlayerButton":
             draw_eyes(draw_list, x + width/10, y + height/10, width * 8/10, height * 8/10, True, color, blink_offset = ((time.time())*-7.12+1))

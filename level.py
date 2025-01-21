@@ -116,6 +116,7 @@ class Level:
                 block = Block(self, *args, **kwargs)
                 # For UsefulMod
                 kwargs["usefulTags"]=[]
+                kwargs["usefulVal"]={}
                 block.parent = parent
                 if parent:
                     parent.place_child(int(block.x), int(block.y), block)
@@ -128,6 +129,7 @@ class Level:
             elif block_type == "Ref":
                 ref = Ref(self, *args, **kwargs)
                 kwargs["usefulTags"]=[]
+                kwargs["usefulVal"]={}
                 if not int(ref.infenter):
                     refs.append(ref)
                 if parent:

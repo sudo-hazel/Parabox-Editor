@@ -29,15 +29,15 @@ def umenu(rb,imgui):
             if imgui.begin_menu("UsefulMod"):
                 imgui.begin_group()
                 ###
-                imgui.begin_group()
-                changed, value = imgui.checkbox("PCF", "PCF" in rb.usefulTags)
+
+                changed, value = imgui.checkbox("Camera Follow(!)", "PCF" in rb.usefulTags)
                 if changed:
                     tagchange1(rb, "PCF", bool(value))
-                imgui.same_line()
-                changed, value = imgui.checkbox("NOV", "NOV" in rb.usefulTags)
+                
+                changed, value = imgui.checkbox("Invert Void(!)", "NOV" in rb.usefulTags)
                 if changed:
                     tagchange1(rb, "NOV", bool(value))
-                imgui.end_group()
+
                 changed, value = imgui.checkbox("Inf Zone", "IFZ" in rb.usefulTags)
                 if changed:
                     tagchange1(rb, "IFZ", bool(value))
@@ -77,56 +77,55 @@ def umenu(rb,imgui):
                     if aut == -1:
                         rb.usefulVal["AUT"] = 0
                     else:
-                        rb.usefulVal.remove("AUT")
+                        del rb.usefulVal["AUT"]
                 imgui.same_line()
                 if imgui.radio_button("D", aut == 1):
                     if aut == -1:
                         rb.usefulVal["AUT"] = 1
                     else:
-                        rb.usefulVal.remove("AUT")
+                        del rb.usefulVal["AUT"]
                 imgui.same_line()
                 if imgui.radio_button("L", aut == 2):
                     if aut == -1:
                         rb.usefulVal["AUT"] = 2
                     else:
-                        rb.usefulVal.remove("AUT")
+                        del rb.usefulVal["AUT"]
                 imgui.same_line()
                 if imgui.radio_button("R", aut == 3):
                     if aut == -1:
-                        rb.usefulVal["AUT"] = 2
+                        rb.usefulVal["AUT"] = 3
                     else:
-                        rb.usefulVal.remove("AUT")
+                        del rb.usefulVal["AUT"]
+                changed, value = imgui.checkbox("NLR", "NLR" in rb.usefulVal)
+                if changed:
+                    if value:#==True
+                        rb.usefulVal["NLR"]=0
+                    else: del rb.usefulVal["NLR"]
+                nlrid = 0
+                if "NLR" in rb.usefulVal: nlrid = rb.usefulVal["NLR"]
+                changed, int_val = imgui.input_int('ID', nlrid)
+                imgui.end_group()
+                ##
+                imgui.end_menu()
+            if imgui.begin_menu("Useful2"):
                 imgui.text("Wrap:")
                 wrp = 0
                 if "WRP" in rb.usefulVal:
                      wrp = int(rb.usefulVal["WRP"])
                 # Bitwise Pain
-                changed, value = imgui.checkbox("U", wrp & 1)
-                if changed: wrp ^= 1
+                changed, value = imgui.checkbox("U", (wrp & 1)==1)
+                if changed: rb.usefulVal["WRP"]= wrp ^ 1
                 imgui.same_line()
                 changed, value = imgui.checkbox("D", wrp & 2)
-                if changed: wrp ^= 2
+                if changed: rb.usefulVal["WRP"]= wrp ^ 2
                 imgui.same_line()
                 changed, value = imgui.checkbox("L", wrp & 4)
-                if changed: wrp ^= 4
+                if changed: rb.usefulVal["WRP"]= wrp ^ 4
                 imgui.same_line()
                 changed, value = imgui.checkbox("R", wrp & 8)
-                if changed: wrp ^= 8
+                if changed: rb.usefulVal["WRP"]= wrp ^ 8
                 # End bitwise pain
-                if wrp == 0 and "WRP" in rb.usefulVal:
-                    rb.usefulVal.remove("WRP")
-                changed, value = imgui.checkbox("Null Ref", "NLR" in rb.usefulVal)
-                if changed:
-                    if value:#==True
-                        rb.usefulVal["NLR"]=0
-                    else: rb.usefulVal.remove("NLR")
-                nlrid = 0
-                if "NLR" in rb.usefulVal: nlrid = rb.usefulVal["NLR"]
-                changed, int_val = imgui.input_int('ID', nlrid)
-                if changed:
-                    rb.usefulVal["NLR"] = int_val
-                imgui.end_group()
-                ##
+                if "WRP" in rb.usefulVal and rb.usefulVal["WRP"]==0:
+                    del rb.usefulVal["WRP"]
                 imgui.end_menu()
-
      
