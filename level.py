@@ -164,6 +164,8 @@ class Level:
                     kwargs["usefulVal"][block_type[1:]] = int(args[0])
                 elif block_type[1:] in tags["long"]:
                     kwargs["usefulVal"][block_type[1:]] = args
+                else:
+                    print("Unkown UM ", block_type[1:])
             # Start Normal Block Parsing
             else:
                 if block_type == "Block":
@@ -238,19 +240,9 @@ class Level:
         if self.metadata["custom_level_palette"] != -1:
             data += "custom_level_palette " + str(self.metadata["custom_level_palette"]) + "\n"
         # UsefulMod
-        # TODO
-        """
-        if self.metadata["winfz_sensitivity"]:
-            data += "winfz_sensitivity 1\n"
-        if self.metadata["white_eyes"]:
-            data += "white_eyes 1\n"
-        if self.metadata["banish_fix"]:
-            data += "banish_fix 1\n"
-        if self.metadata["ifzeat_fix"]:
-            data += "ifzeat_fix 1\n"
-        if self.metadata["epsi_fix"]:
-            data += "epsi_fix 1\n"
-        """
+        for useful_header in headers:
+            if self.metadata[useful_header] != headers[useful_header]["default"]:
+                data += useful_header+" "+str(self.metadata[useful_header])+"\n"
         data += "#\n"
         # Our comment system
         if self.editor_options['preopen'] == False:

@@ -102,8 +102,38 @@ class Editor:
                     changed, value = imgui.checkbox("Preopen", self.level.editor_options['preopen'])
                     if changed: self.level.editor_options['preopen']=value
                 imgui.end_menu()
-            
-            
+            if usefulmod.enabled and self.level != None and imgui.begin_menu("Usefulmod"):
+                if imgui.begin_menu("Fixes"):
+                    changed, value = imgui.checkbox("Seam Fix", to_bool(self.level.metadata["seam_fix"]))
+                    if changed: self.level.metadata["seam_fix"] = int(value)
+                    changed, value = imgui.checkbox("Banish Fix", to_bool(self.level.metadata["banish_fix"]))
+                    if changed: self.level.metadata["banish_fix"] = int(value)
+                    changed, value = imgui.checkbox("Epsilon Fix", to_bool(self.level.metadata["epsi_fix"]))
+                    if changed: self.level.metadata["epsi_fix"] = int(value)
+                    changed, value = imgui.checkbox("Ifz Eat Fix", to_bool(self.level.metadata["ifzeat_fix"]))
+                    if changed: self.level.metadata["ifzeat_fix"] = int(value)
+                    imgui.end_menu()
+                if imgui.begin_menu("Styles"):
+                    imgui_label_left("WinfSense(!)")
+                    imgui.core.push_item_width(60)
+                    imgui.core.push_id("use_winf")
+                    changed, value = imgui.input_int("", self.level.metadata["winfz_sensitivity"])
+                    if changed:
+                        if 3 >= value and value >= 0: self.level.metadata["winfz_sensitivity"] = value
+                    imgui.core.pop_id()
+                    imgui.core.pop_item_width()
+                    changed, value = imgui.checkbox("Hue Shift", to_bool(self.level.metadata["hue_shift"]))
+                    if changed: self.level.metadata["hue_shift"] = int(value)
+                    changed, value = imgui.checkbox("White eyes", to_bool(self.level.metadata["white_eyes"]))
+                    if changed: self.level.metadata["white_eyes"] = int(value)
+                    changed, value = imgui.checkbox("Zoom in", to_bool(self.level.metadata["zoom_in"]))
+                    if changed: self.level.metadata["zoom_in"] = int(value)
+                    changed, value = imgui.checkbox("Zoom Out", to_bool(self.level.metadata["zoom_out"]))
+                    if changed: self.level.metadata["zoom_out"] = int(value) 
+                    imgui.end_menu()
+                changed, value = imgui.checkbox("Ice Move", to_bool(self.level.metadata["ice_move"]))
+                if changed: self.level.metadata["ice_move"] = int(value) 
+                imgui.end_menu()
             if imgui.begin_menu("Help"):
                 imgui.bullet_text("To create a new level, go to File > New.")
                 imgui.bullet_text("Left click a tile in the palette to grab it, or click the plus to make a new box.")

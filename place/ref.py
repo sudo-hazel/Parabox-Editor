@@ -215,9 +215,18 @@ class Ref:
         changed, value = imgui.checkbox("Possessable", self.possessable)
         if changed:
             self.possessable = value
-        changed, value = imgui.checkbox("Flip Horizontally", self.fliph)
-        if changed:
-            self.fliph = value
+        if not usefulmod.enabled:
+            changed, value = imgui.checkbox("Flip Horizontally", to_bool(self.fliph))
+            if changed:
+                self.fliph = int(value)
+        else:
+            changed, value = imgui.checkbox("Flip Horizontally", to_bool(self.fliph & 1))
+            if changed:
+                self.fliph = self.fliph ^ 1
+            imgui.same_line()
+            changed, value = imgui.checkbox("Flip Vert", to_bool(self.fliph & 2))
+            if changed:
+                self.fliph = self.fliph ^ 2
         changed, value = imgui.checkbox("Float in Space", self.floatinspace)
         if changed:
             self.floatinspace = value

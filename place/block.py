@@ -351,9 +351,18 @@ class Block:
         changed, value = imgui.checkbox("Possessable", to_bool(self.possessable))
         if changed:
             self.possessable = int(value)
-        changed, value = imgui.checkbox("Flip Horizontally", to_bool(self.fliph))
-        if changed:
-            self.fliph = int(value)
+        if not usefulmod.enabled:
+            changed, value = imgui.checkbox("Flip Horizontally", to_bool(self.fliph))
+            if changed:
+                self.fliph = int(value)
+        else:
+            changed, value = imgui.checkbox("Flip Horizontally", to_bool(self.fliph & 1))
+            if changed:
+                self.fliph = self.fliph ^ 1
+            imgui.same_line()
+            changed, value = imgui.checkbox("Flip Vert", to_bool(self.fliph & 2))
+            if changed:
+                self.fliph = self.fliph ^ 2
         changed, value = imgui.checkbox("Float in Space", to_bool(self.floatinspace))
         if changed:
             self.floatinspace = int(value)
