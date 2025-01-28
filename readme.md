@@ -10,5 +10,8 @@
 - Output goes in `build/nsis/Zygans_Parabox_Editor_`(version)`.exe`
 
 # To develop:
-- Python 3.9.11 (or higher)
-- pyimgui 1.4.1 (or higher)
+- Python 3.11.9 (or higher)
+- pyimgui 2
+
+# To debug:
+Window logs in C:\Users\Name\AppData\Roaming

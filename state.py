@@ -13,7 +13,7 @@ class UsefulMod:
     def __init__(self):
         self.warn = False
         # Do not modify directly. Call self.enable or self.disable.
-        self.enabled = True
+        self.enabled = False
         self.purge = False
     def enable(self, floor_types, state=True):
         self.enabled = state

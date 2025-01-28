@@ -160,7 +160,7 @@ class Block:
             draw_shine(draw_list, x, y, width, height, fliph ^ self.fliph)
         # Useful Mod (Always Enabled Internal)
         # TODO uncomment
-        if True: # depth >= 0:
+        if depth >= 0:
             if self.usefulTags and "?WEI" in self.usefulTags:
                 draw_weight(draw_list, x, y, width, height)
             if self.usefulTags and "?PIN" in self.usefulTags:
